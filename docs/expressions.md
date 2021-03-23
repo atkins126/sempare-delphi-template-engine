@@ -1,6 +1,6 @@
-# ![](../images/sempare-logo-45px.png) Sempare Boot Velocity Template Engine
+# ![](../images/sempare-logo-45px.png) Sempare Template Engine
 
-Copyright (c) 2019 [Sempare Limited](http://www.sempare.ltd), [Conrad Vermeulen](mailto:conrad.vermeulen@gmail.com)
+Copyright (c) 2019-2021 [Sempare Limited](http://www.sempare.ltd)
 
 ## Expressions
 
@@ -30,7 +30,7 @@ The following Delphi code illustrates the usage:
 begin
   var l := TList<string>.Create;
   l.AddRange(['1','2','3']);
-  Assert.IsEqual('123', Velocity.Eval('<% for v in _ %><% v %><% end %>', l));
+  Assert.IsEqual('123', Template.Eval('<% for v in _ %><% v %><% end %>', l));
   L.Free;
 end;
 ```
@@ -38,3 +38,12 @@ end;
 If the variable is not found, the variable will be referenced on _.
 
 This means that <% a %> will be the same as <% _.a %>.
+
+# Strings
+
+Strings can be single quote or double quotes. There is no special meaning on either. The backslash can be used for escaping.
+
+```
+<% 'that\'s nice' %>
+<% "that's nice" %>
+```

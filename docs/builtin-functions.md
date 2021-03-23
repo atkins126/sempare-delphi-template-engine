@@ -1,7 +1,6 @@
-# ![](../images/sempare-logo-45px.png) Sempare Boot Velocity Template Engine
+# ![](../images/sempare-logo-45px.png) Sempare Template Engine
 
-Copyright (c) 2019 [Sempare Limited](http://www.sempare.ltd), [Conrad Vermeulen](mailto:conrad.vermeulen@gmail.com)
-
+Copyright (c) 2019-2021 [Sempare Limited](http://www.sempare.ltd)
 
 ## Builtin functions
 
@@ -26,6 +25,18 @@ Copyright (c) 2019 [Sempare Limited](http://www.sempare.ltd), [Conrad Vermeulen]
 - [lowercase](#lowercase)
 - [startswith](#startswith)
 - [endswith](#endswith)
+- [typeof](#typeof)
+- [replace](#replace)
+- [match](#match)
+- [sort](#sort)
+- [chr](#chr)
+- [ord](#ord)
+- [padleft](#padleft)
+- [padright](#padright)
+- [tabs](#tabs)
+- [spaces](#spaces)
+- [crnl](#crnl)
+- [nl](#nl)
 
 
 ## trim(string)
@@ -60,7 +71,7 @@ Allows a string to be formatted using SysUtils format().
 	
 For formatting options, see: http://docwiki.embarcadero.com/Libraries/Rio/en/System.SysUtils.Format#Format_Strings
 ## len(string)
-Return the length of a string.
+Return the length of a string or an array.
 
 ```<% len('hello world') %>```
 ## str(any) / isstr(any)
@@ -123,4 +134,78 @@ Check if a string starts with another.
 Check if a string ends with another.
 ```
 <% endswith('heLlo', 'lo') %>
+```
+
+## typeof(obj)
+Return the class name of an object.
+
+```
+<% typeof(myObj) %>
+```
+
+## replace(search, replacement, str)
+Replace some text with another.
+```
+<% replace('a', 'hello ', 'aaa') %>
+```
+
+## match(text, regex)
+Matches text in a regular expression.
+```
+<% match('aaaaaaaaaaaaaa', 'a+') %>
+```
+For more information, see http://docwiki.embarcadero.com/Libraries/Rio/en/System.RegularExpressions.TRegEx.Matches
+
+## sort(array)
+Sorts basic arrays of integer, double, extended and string or something enumerable of these types.
+```
+<% values := sort(split('g,f,d,s,d,a', ',')) %>
+```
+
+## chr(val)
+Convert a numeric value to the character counterpart.
+```
+<% chr(10) %>
+```
+
+## ord(char)
+Convert a character to the numeric counterpart.
+```
+<% ord('a') %>
+```
+
+## padleft(str, len[, padchar=' '])
+Pad string with padchar from the left till the string is len long.
+```
+<% padleft('123', 6) %>
+```
+
+## padright(str, len[, padchar=' '])
+Pad string with padchar from the right till the string is len long.
+```
+<% padright('123', 6) %>
+```
+
+## tabs(len)
+Return len tabs
+```
+<% tabs(2) %>
+```
+
+## spaces(len)
+return len spaces
+```
+<% spaces(2) %>
+```
+
+## crnl(len)
+return a string with len #13#10
+```
+<% crnl(2) %>
+```
+
+## nl(len)
+return a string with len #10
+```
+<% nl(2) %>
 ```

@@ -1,0 +1,84 @@
+ (*%*************************************************************************************************
+ *                 ___                                                                              *
+ *                / __|  ___   _ __    _ __   __ _   _ _   ___                                      *
+ *                \__ \ / -_) | '  \  | '_ \ / _` | | '_| / -_)                                     *
+ *                |___/ \___| |_|_|_| | .__/ \__,_| |_|   \___|                                     *
+ *                                    |_|                                                           *
+ ****************************************************************************************************
+ *                                                                                                  *
+ *                        Sempare Templating Engine                                                 *
+ *                                                                                                  *
+ *                                                                                                  *
+ *         https://github.com/sempare/sempare-delphi-template-engine                                *
+ ****************************************************************************************************
+ *                                                                                                  *
+ * Copyright (c) 2020 Sempare Limited                                                               *
+ *                                                                                                  *
+ * Contact: info@sempare.ltd                                                                        *
+ *                                                                                                  *
+ * Licensed under the GPL Version 3.0 or the Sempare Commercial License                             *
+ * You may not use this file except in compliance with one of these Licenses.                       *
+ * You may obtain a copy of the Licenses at                                                         *
+ *                                                                                                  *
+ * https://www.gnu.org/licenses/gpl-3.0.en.html                                                     *
+ * https://github.com/sempare/sempare-delphi-template-engine/blob/master/docs/commercial.license.md *
+ *                                                                                                  *
+ * Unless required by applicable law or agreed to in writing, software                              *
+ * distributed under the Licenses is distributed on an "AS IS" BASIS,                               *
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.                         *
+ * See the License for the specific language governing permissions and                              *
+ * limitations under the License.                                                                   *
+ *                                                                                                  *
+ *************************************************************************************************%*)
+package Sempare.Template.Pkg;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  dbrtl;
+
+contains
+  Sempare.Template.Visitor in 'src\Sempare.Template.Visitor.pas',
+  Sempare.Template.Util in 'src\Sempare.Template.Util.pas',
+  Sempare.Template.StackFrame in 'src\Sempare.Template.StackFrame.pas',
+  Sempare.Template.Rtti in 'src\Sempare.Template.Rtti.pas',
+  Sempare.Template.PrettyPrint in 'src\Sempare.Template.PrettyPrint.pas',
+  Sempare.Boot.Template.Velocity in 'src\Sempare.Boot.Template.Velocity.pas',
+  Sempare.Template.Parser in 'src\Sempare.Template.Parser.pas',
+  Sempare.Template.Lexer in 'src\Sempare.Template.Lexer.pas',
+  Sempare.Template.Functions in 'src\Sempare.Template.Functions.pas',
+  Sempare.Template.Evaluate in 'src\Sempare.Template.Evaluate.pas',
+  Sempare.Template.Context in 'src\Sempare.Template.Context.pas',
+  Sempare.Template.Common in 'src\Sempare.Template.Common.pas',
+  Sempare.Template.AST in 'src\Sempare.Template.AST.pas',
+  Sempare.Template in 'src\Sempare.Template.pas',
+  Sempare.Template.JSON in 'src\Sempare.Template.JSON.pas',
+  Sempare.Template.ResourceStrings in 'src\Sempare.Template.ResourceStrings.pas';
+
+end.

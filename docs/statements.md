@@ -1,6 +1,6 @@
-# ![](../images/sempare-logo-45px.png) Sempare Boot Velocity Template Engine
+# ![](../images/sempare-logo-45px.png) Sempare Template Engine
 
-Copyright (c) 2019 [Sempare Limited](http://www.sempare.ltd), [Conrad Vermeulen](mailto:conrad.vermeulen@gmail.com)
+Copyright (c) 2019-2021 [Sempare Limited](http://www.sempare.ltd)
 
 ## Statements
 
@@ -13,6 +13,7 @@ Copyright (c) 2019 [Sempare Limited](http://www.sempare.ltd), [Conrad Vermeulen]
 7. [with](#with)
 8. [template](#template)
 9. [require](#require)
+10. [ignorenl](#ignorenl)
 
 ### print
 
@@ -101,7 +102,7 @@ var
 begin
   info := TList<TInfo>.create;
   info.AddRange([TInfo.create('conrad', 10), TInfo.create('christa', 20)]);
-  writeln(Velocity.Eval(template, info));
+  writeln(Template.Eval(template, info));
   info.Free;
 end;
 ```
@@ -121,8 +122,8 @@ While blocks are very flexibe looping constructs based on a boolean condition be
 <% i := 1 %>
 <% while i <= 3 %>
    <% i %>
-   <% i := 1 + 1%>
-<% end %
+   <% i := i + 1%>
+<% end %>
 ```
 
 This produces the following:
@@ -153,7 +154,7 @@ An example using 'break':
 ```
 <% i := 0 %>
 <% while true %>
- <% if i = 3%><% break %><% end %><% i %>
+ <% if i = 3%><% break %><% end %><% i %><% i:=i+1%>
 <% end %>
 ```
 This will produce
@@ -163,7 +164,7 @@ This will produce
 
 ### include
 
-You may want to decompose templates into reusable parts. You register templates on a Velocity context. 
+You may want to decompose templates into reusable parts. You register templates on a Template context. 
 
 ```
 type
@@ -173,13 +174,13 @@ type
         email : string;
     end;
 begin
-   var ctx := Velocity.context();
+   var ctx := Template.context();
    ctx['year'] := 2019;
    ctx['company'] := 'Sempare Limited';
    ctx['email'] := 'info@sempare.ltd';
-   ctx.RegisterTemplate('header', Velocity.Parse('Copyright (c) <% year %> <% company %> '));
-   ctx.RegisterTemplate('footer', Velocity.Parse('Contact us <% email %> '));
-   var tpl := Velocity.parse('<% include (''header'') %> some content <% include (''footer'') %>');
+   ctx.RegisterTemplate('header', Template.Parse('Copyright (c) <% year %> <% company %> '));
+   ctx.RegisterTemplate('footer', Template.Parse('Contact us <% email %> '));
+   var tpl := Template.parse('<% include (''header'') %> some content <% include (''footer'') %>');
 ```
 
 include() can also take a second parameter, allowing for improved scoping of variables, similar to the _with_ statement.
@@ -207,10 +208,10 @@ begin
 	var info : TInfo;
 	info.level1.level2.value := 'test';
 	info.level1.level2.level3.level4.value := 'hello';	
-	Velocity.Eval('<% level1.level2.level3.level4.value %> <% level1.level2.level3.level4.value %> <% level1.level2.level3.level4.value %>', info)
+	Template.Eval('<% level1.level2.level3.level4.value %> <% level1.level2.level3.level4.value %> <% level1.level2.level3.level4.value %>', info)
 
 	// can be replaced with
-	Velocity.Eval('<% with level1.level2.level3.level4 %><% value %> <% value %> <% value %><% end %>', info)
+	Template.Eval('<% with level1.level2.level3.level4 %><% value %> <% value %> <% value %><% end %>', info)
 
 ```
 
@@ -245,7 +246,7 @@ type
 begin
 	var info : TInfo;
 	info.name := 'Jane';
-	writeln(Velocity.Eval('<% require(''TInfo'') %>', info));
+	writeln(Template.Eval('<% require(''TInfo'') %>', info));
 end;
 ```
 
@@ -253,3 +254,29 @@ An exeption is thrown when the
 
 _require_ can take multiple parameters - in which case the input must match one of the types listed.
 
+### ignorenl
+
+The purpose of an _ignorenl_ block is to allow for template designers to space out content for easy maintenance, but to allow for the output to be more compact when required.
+
+```
+
+	<table>
+<% ignorenl %>
+		<tr>
+			<td>Col1</td>
+			<td>Col2</td>
+		</tr>
+<% end %>
+	</table>
+
+```
+
+This would yield something like
+
+```
+  <table>
+  	<tr><td>Col1</td><td>Col2</td></tr>
+  </table>
+```
+
+The _eoAllowIgnoreNL_ must be provided in the Context.Options or via Template.Eval() options.

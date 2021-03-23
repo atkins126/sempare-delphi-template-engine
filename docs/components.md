@@ -1,28 +1,30 @@
-# ![](../images/sempare-logo-45px.png) Sempare Boot Velocity Template Engine
+# ![](../images/sempare-logo-45px.png) Sempare Template Engine
 
-Copyright (c) 2019 [Sempare Limited](http://www.sempare.ltd), [Conrad Vermeulen](mailto:conrad.vermeulen@gmail.com)
-
+Copyright (c) 2019-2021 [Sempare Limited](http://www.sempare.ltd)
 
 ## Components
 
-Sempare Boot Velocity uses interfaces extensively. This makes memory management much easier as interfaced objects are reference counted and alls for code to be more readable as minimal try/catch/finally block are required.
+The Sempare Template Engine uses interfaces extensively. This makes memory management much easier as interfaced objects are reference counted and alls for code to be more readable as minimal try/catch/finally block are required.
 
-To ease the use of Sempare Boot Velocity, you need to just include a reference to the _Sempare.Boot.Template.Velocity_ unit:
+To ease the use of Sempare Template Engine you need to just include a reference to the _Sempare.Template._ unit:
 ```
 uses
-    Sempare.Boot.Template.Velocity;
+    Sempare.Template;
 ```
 
 Key components of interest that are exposed to you are:
-1. [Velocity](#Velocity)
-2. [IVelocityContext](#IVelocityContext)
-3. [IVelocityTemplate](#IVelocityTemplate)
+1. [Template](#Template)
+2. [ITemplateContext](#ITemplateContext)
+3. [ITemplate](#ITemplate)
 
-### Velocity
+Initially, some true Delphi Components (based off TComponent) were also provided. See [Design Considerations](./design-considerations.md) for more information.
 
-The Velocity class exposes static class methods acting as an entry point to the Velocity engine with output being to a TStream or string.
 
-Most common use cases would be to use Velocity.Eval(), Velocity.Parse() and Velocity.Context() methods. More information will be provided later.
+### Template
+
+The Template class exposes static class methods acting as an entry point to the Template engine with output being to a TStream or string.
+
+Most common use cases would be to use Template.Eval(), Template.Parse() and Template.Context() methods. More information will be provided later.
 
 ```
 type
@@ -30,77 +32,77 @@ type
                 name : string;
             end;
 begin
-   var template := Velocity.parse('hello <% name %>');
+   var template := Template.parse('hello <% name %>');
    var info : TInfo;
    info.name := 'sue';
 
    // Eval returning a string
-   writeln(Velocity.Eval(template, info));
+   writeln(Template.Eval(template, info));
 
    // Eval writing to a stream
    var s:= TStringStream.Create();
    try
-   	    Velocity.Eval(template, info, s);
+   	    Template.Eval(template, info, s);
         writeln(s.DataString);
    finally
 	s.Free;
    end;
 end;
 ```
-The Velocity class provides many other useful methods:
+The Template class provides many other useful methods:
 ```
-   Velocity = class
+   Template = class
   public
-    class function Context(AOptions: TVelocityEvaluationOptions = []): IVelocityContext; inline; static;
-    class function Parser(const AContext: IVelocityContext): IVelocityParser; overload; inline; static;
-    class function Parser(): IVelocityParser; overload; inline; static;
-    class function PrettyPrint(const ATemplate: IVelocityTemplate): string; inline; static;
+    class function Context(AOptions: TTemplateEvaluationOptions = []): ITemplateContext; inline; static;
+    class function Parser(const AContext: ITemplateContext): ITemplateParser; overload; inline; static;
+    class function Parser(): ITemplateParser; overload; inline; static;
+    class function PrettyPrint(const ATemplate: ITemplate): string; inline; static;
 
     // EVAL output to stream
 
-    class procedure Eval(const ATemplate: string; const AStream: TStream; const AOptions: TVelocityEvaluationOptions = []); overload; static;
-    class procedure Eval<T>(const ATemplate: string; const AValue: T; const AStream: TStream; const AOptions: TVelocityEvaluationOptions = []); overload; static;
-    class procedure Eval<T>(const ATemplate: IVelocityTemplate; const AValue: T; const AStream: TStream; const AOptions: TVelocityEvaluationOptions = []); overload; static;
-    class procedure Eval(const ATemplate: IVelocityTemplate; const AStream: TStream; const AOptions: TVelocityEvaluationOptions = []); overload; static;
-    class procedure Eval<T>(const AContext: IVelocityContext; const ATemplate: IVelocityTemplate; const AValue: T; const AStream: TStream); overload; static;
-    class procedure Eval<T>(const AContext: IVelocityContext; const ATemplate: string; const AValue: T; const AStream: TStream); overload; static;
-    class procedure Eval(const AContext: IVelocityContext; const ATemplate: string; const AStream: TStream); overload; static;
-    class procedure Eval(const AContext: IVelocityContext; const ATemplate: IVelocityTemplate; const AStream: TStream); overload; static;
+    class procedure Eval(const ATemplate: string; const AStream: TStream; const AOptions: TTemplateEvaluationOptions = []); overload; static;
+    class procedure Eval<T>(const ATemplate: string; const AValue: T; const AStream: TStream; const AOptions: TTemplateEvaluationOptions = []); overload; static;
+    class procedure Eval<T>(const ATemplate: ITemplate; const AValue: T; const AStream: TStream; const AOptions: TTemplateEvaluationOptions = []); overload; static;
+    class procedure Eval(const ATemplate: ITemplate; const AStream: TStream; const AOptions: TTemplateEvaluationOptions = []); overload; static;
+    class procedure Eval<T>(const AContext: ITemplateContext; const ATemplate: ITemplate; const AValue: T; const AStream: TStream); overload; static;
+    class procedure Eval<T>(const AContext: ITemplateContext; const ATemplate: string; const AValue: T; const AStream: TStream); overload; static;
+    class procedure Eval(const AContext: ITemplateContext; const ATemplate: string; const AStream: TStream); overload; static;
+    class procedure Eval(const AContext: ITemplateContext; const ATemplate: ITemplate; const AStream: TStream); overload; static;
 
     // EVAL returning string
 
-    class function Eval(const ATemplate: string; const AOptions: TVelocityEvaluationOptions = []): string; overload; static;
-    class function Eval<T>(const ATemplate: string; const AValue: T; const AOptions: TVelocityEvaluationOptions = []): string; overload; static;
-    class function Eval<T>(const ATemplate: IVelocityTemplate; const AValue: T; const AOptions: TVelocityEvaluationOptions = []): string; overload; static;
-    class function Eval(const ATemplate: IVelocityTemplate; const AOptions: TVelocityEvaluationOptions = []): string; overload; static;
+    class function Eval(const ATemplate: string; const AOptions: TTemplateEvaluationOptions = []): string; overload; static;
+    class function Eval<T>(const ATemplate: string; const AValue: T; const AOptions: TTemplateEvaluationOptions = []): string; overload; static;
+    class function Eval<T>(const ATemplate: ITemplate; const AValue: T; const AOptions: TTemplateEvaluationOptions = []): string; overload; static;
+    class function Eval(const ATemplate: ITemplate; const AOptions: TTemplateEvaluationOptions = []): string; overload; static;
 
-    class function Eval<T>(const AContext: IVelocityContext; const ATemplate: IVelocityTemplate; const AValue: T): string; overload; static;
-    class function Eval<T>(const AContext: IVelocityContext; const ATemplate: string; const AValue: T): string; overload; static;
-    class function Eval(const AContext: IVelocityContext; const ATemplate: string): string; overload; static;
-    class function Eval(const AContext: IVelocityContext; const ATemplate: IVelocityTemplate): string; overload; static;
+    class function Eval<T>(const AContext: ITemplateContext; const ATemplate: ITemplate; const AValue: T): string; overload; static;
+    class function Eval<T>(const AContext: ITemplateContext; const ATemplate: string; const AValue: T): string; overload; static;
+    class function Eval(const AContext: ITemplateContext; const ATemplate: string): string; overload; static;
+    class function Eval(const AContext: ITemplateContext; const ATemplate: ITemplate): string; overload; static;
 
     // PARSING
 
     // string operations
-    class function Parse(const AString: string): IVelocityTemplate; overload; static;
-    class function Parse(const AContext: IVelocityContext; const AString: string): IVelocityTemplate; overload; static;
+    class function Parse(const AString: string): ITemplate; overload; static;
+    class function Parse(const AContext: ITemplateContext; const AString: string): ITemplate; overload; static;
 
     // stream operations
-    class function Parse(const AStream: TStream): IVelocityTemplate; overload; static;
-    class function Parse(const AContext: IVelocityContext; const AStream: TStream): IVelocityTemplate; overload; static;
+    class function Parse(const AStream: TStream): ITemplate; overload; static;
+    class function Parse(const AContext: ITemplateContext; const AStream: TStream): ITemplate; overload; static;
 
     // file operations
-    class function ParseFile(const AFile: string): IVelocityTemplate; overload; static;
-    class function ParseFile(const AContext: IVelocityContext; const AFile: string): IVelocityTemplate; overload; static;
+    class function ParseFile(const AFile: string): ITemplate; overload; static;
+    class function ParseFile(const AContext: ITemplateContext; const AFile: string): ITemplate; overload; static;
 
   end;
 
 ```
-### IVelocityContext
+### ITemplateContext
 
-The Velocity context object is a container for configuration used when parsing or evaluating templats.
+The Template context object is a container for configuration used when parsing or evaluating templats.
 ```
-    var ctx := Velocity.Context();
+    var ctx := Template.Context();
     ctx.MaxRuntimeMs := 5;
     
     // encoder can be an HTML encoder (discussed later)
@@ -120,22 +122,12 @@ The Velocity context object is a container for configuration used when parsing o
 
 Defining variables in a context allows them to be used in made available to multiple templates easily.
 
-### IVelocityTemplate
+### ITemplate
 
-The output of the Velocity parser is an object implementing the IVelocityTemplate interface.
+The output of the Template parser is an object implementing the ITemplate interface.
 ```
-    var ctx := Velocity.Context();
-    var tpl := Velocity.Parse(ctx, 'this is a template'); 
-    writeln(Velocity.Eval(ctx, tpl));
+    var ctx := Template.Context();
+    var tpl := Template.Parse(ctx, 'this is a template'); 
+    writeln(Template.Eval(ctx, tpl));
 ```
-##### Thread Safety
-The Sempare Boot Velocity template engine should be totally thread safe. There is no shared state besides potential references a shared Velocity context.
 
-Components that should be safe to share are instances of _IVelocityContext_ and _IVelocityTemplate_. 
-
-##### Example use case
-
-In a threaded environement like a web server, the following would take place:
-- the context and templates are initialised at startup.
-- templates are mapped to various routes used by various route controllers
-- controller methods would interact with a database service and pass data to the template engine.
