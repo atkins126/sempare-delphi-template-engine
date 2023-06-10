@@ -1,6 +1,6 @@
 # ![](../images/sempare-logo-45px.png) Sempare Template Engine
 
-Copyright (c) 2019-2021 [Sempare Limited](http://www.sempare.ltd)
+Copyright (c) 2019-2023 [Sempare Limited](http://www.sempare.ltd)
 
 ## Expressions
 
@@ -17,6 +17,8 @@ Comparison expressions ( =, <>, <, <=, >, >= ) work on numeric and string values
 
 Numeric operators (+, -, /, *, mod) work on numeric values.
 The + operator also works on strings so you can append values.
+
+Futher, == is an alias for =, and != is an alias for <>.
 
 # The special _ variable
 A special variable _ (underscore) is defined to allow access to the variable/record/class passed into the template evaluator. 

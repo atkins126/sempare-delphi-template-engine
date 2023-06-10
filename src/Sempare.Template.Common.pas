@@ -12,7 +12,7 @@
  *         https://github.com/sempare/sempare-delphi-template-engine                                *
  ****************************************************************************************************
  *                                                                                                  *
- * Copyright (c) 2020 Sempare Limited                                                               *
+ * Copyright (c) 2019-2023 Sempare Limited                                                          *
  *                                                                                                  *
  * Contact: info@sempare.ltd                                                                        *
  *                                                                                                  *
@@ -62,7 +62,7 @@ type
   private
     FPosition: IPosition;
   public
-    constructor Create(APosition: IPosition; const AMessage: string);
+    constructor Create(const APosition: IPosition; const AMessage: string);
     property Position: IPosition read FPosition write FPosition implements IPosition;
   end;
 
@@ -96,70 +96,57 @@ type
     property Variables[const AKey: string]: TTemplateValue read GetItem write SetItem; default;
   end;
 
-function AsVisitorHost(ATemplate: ITemplate): ITemplateVisitorHost; inline; overload;
-function AsVisitorHost(AExpr: IExpr): ITemplateVisitorHost; inline; overload;
-function AsVisitorHost(AStmt: IStmt): ITemplateVisitorHost; inline; overload;
+procedure AcceptVisitor(const ATemplate: ITemplate; const AVisitor: ITemplateVisitor); inline; overload;
+procedure AcceptVisitor(const AExpr: IExpr; const AVisitor: ITemplateVisitor); inline; overload;
+procedure AcceptVisitor(const AStmt: IStmt; const AVisitor: ITemplateVisitor); inline; overload;
+procedure AcceptVisitor(const AExpr: IExprList; const AVisitor: ITemplateVisitor); inline; overload;
 
-procedure AcceptVisitor(ATemplate: ITemplate; AVisitor: ITemplateVisitor); overload;
-procedure AcceptVisitor(AExpr: IExpr; AVisitor: ITemplateVisitor); overload;
-procedure AcceptVisitor(AStmt: IStmt; AVisitor: ITemplateVisitor); overload;
+function Position(const APositional: IPosition): string; inline; overload;
 
-function Position(AStmt: IStmt): IPosition; inline; overload;
-function Position(AExpr: IExpr): IPosition; inline; overload;
-function Position(APositional: IPosition): string; inline; overload;
-
-procedure RaiseError(APositional: IPosition; const AFormat: string; const AArgs: array of const); overload;
-procedure RaiseError(APositional: IPosition; const AFormat: string); overload;
+procedure RaiseError(const APositional: IPosition; const AFormat: string; const AArgs: array of const); overload;
+procedure RaiseError(const APositional: IPosition; const AFormat: string); overload;
+procedure RaiseErrorRes(const APositional: IPosition; const ResStringRec: PResStringRec; const AArgs: array of const); overload;
+procedure RaiseErrorRes(const APositional: IPosition; const ResStringRec: PResStringRec); overload;
 
 implementation
 
-function AsVisitorHost(ATemplate: ITemplate): ITemplateVisitorHost; overload;
+uses
+  Sempare.Template;
+
+procedure AcceptVisitor(const ATemplate: ITemplate; const AVisitor: ITemplateVisitor); overload;
 begin
-  ATemplate.QueryInterface(ITemplateVisitorHost, result);
+  if not assigned(ATemplate) then
+    exit;
+  ATemplate.Accept(AVisitor);
 end;
 
-function AsVisitorHost(AExpr: IExpr): ITemplateVisitorHost;
+procedure AcceptVisitor(const AExpr: IExpr; const AVisitor: ITemplateVisitor);
 begin
-  AExpr.QueryInterface(ITemplateVisitorHost, result);
+  if not assigned(AExpr) then
+    exit;
+  AExpr.Accept(AVisitor);
 end;
 
-function AsVisitorHost(AStmt: IStmt): ITemplateVisitorHost;
+procedure AcceptVisitor(const AStmt: IStmt; const AVisitor: ITemplateVisitor);
 begin
-  AStmt.QueryInterface(ITemplateVisitorHost, result);
+  if not assigned(AStmt) then
+    exit;
+  AStmt.Accept(AVisitor);
 end;
 
-procedure AcceptVisitor(ATemplate: ITemplate; AVisitor: ITemplateVisitor); overload;
-begin
-  AsVisitorHost(ATemplate).Accept(AVisitor);
-end;
-
-procedure AcceptVisitor(AExpr: IExpr; AVisitor: ITemplateVisitor);
-begin
-  AsVisitorHost(AExpr).Accept(AVisitor);
-end;
-
-procedure AcceptVisitor(AStmt: IStmt; AVisitor: ITemplateVisitor);
-begin
-  AsVisitorHost(AStmt).Accept(AVisitor);
-end;
-
-function Position(AStmt: IStmt): IPosition; overload;
+procedure AcceptVisitor(const AExpr: IExprList; const AVisitor: ITemplateVisitor);
 var
-  LSymbol: IPositional;
+  i: integer;
 begin
-  AStmt.QueryInterface(IPositional, LSymbol);
-  exit(LSymbol.Position);
+  if not assigned(AExpr) then
+    exit;
+  for i := 0 to AExpr.Count - 1 do
+  begin
+    AExpr[i].Accept(AVisitor);
+  end;
 end;
 
-function Position(AExpr: IExpr): IPosition; overload;
-var
-  LSymbol: IPositional;
-begin
-  AExpr.QueryInterface(IPositional, LSymbol);
-  exit(LSymbol.Position);
-end;
-
-function Position(APositional: IPosition): string; overload;
+function Position(const APositional: IPosition): string; overload;
 var
   LName: string;
 begin
@@ -169,22 +156,32 @@ begin
     LName := ''
   else
     LName := APositional.FileName + ':';
-  exit(format('%s%d[%d]', [LName, APositional.Line, APositional.Pos]));
+  exit(format('%s (Line %d, Column %d) ', [LName, APositional.Line, APositional.Pos]));
 end;
 
-procedure RaiseError(APositional: IPosition; const AFormat: string; const AArgs: array of const); overload;
+procedure RaiseError(const APositional: IPosition; const AFormat: string; const AArgs: array of const); overload;
 begin
   raise ETemplateEvaluationError.Create(APositional, Position(APositional) + format(AFormat, AArgs));
 end;
 
-procedure RaiseError(APositional: IPosition; const AFormat: string); overload;
+procedure RaiseError(const APositional: IPosition; const AFormat: string); overload;
 begin
   RaiseError(APositional, AFormat, []);
 end;
 
+procedure RaiseErrorRes(const APositional: IPosition; const ResStringRec: PResStringRec; const AArgs: array of const);
+begin
+  raise ETemplateEvaluationError.Create(APositional, Position(APositional) + format(LoadResString(ResStringRec), AArgs));
+end;
+
+procedure RaiseErrorRes(const APositional: IPosition; const ResStringRec: PResStringRec);
+begin
+  RaiseErrorRes(APositional, ResStringRec, []);
+end;
+
 { ETemplateEvaluationError }
 
-constructor ETemplateEvaluationError.Create(APosition: IPosition; const AMessage: string);
+constructor ETemplateEvaluationError.Create(const APosition: IPosition; const AMessage: string);
 begin
   inherited Create(AMessage);
   FPosition := APosition;
@@ -234,6 +231,11 @@ end;
 procedure TTemplateVariables.Clear;
 begin
   FVariables.Clear;
+  self['SEMPARE_TEMPLATE_ENGINE_VERSION'] := Template.Version;
+  self['CR'] := #13;
+  self['NL'] := #10;
+  self['CRNL'] := #13#10;
+  self['TAB'] := #9;
 end;
 
 function TTemplateVariables.ContainsKey(const AKey: string): boolean;
@@ -244,6 +246,7 @@ end;
 constructor TTemplateVariables.Create;
 begin
   FVariables := TDictionary<string, TTemplateValue>.Create;
+  Clear;
 end;
 
 destructor TTemplateVariables.Destroy;

@@ -12,7 +12,7 @@
  *         https://github.com/sempare/sempare-delphi-template-engine                                *
  ****************************************************************************************************
  *                                                                                                  *
- * Copyright (c) 2020 Sempare Limited                                                               *
+ * Copyright (c) 2019-2023 Sempare Limited                                                          *
  *                                                                                                  *
  * Contact: info@sempare.ltd                                                                        *
  *                                                                                                  *
@@ -56,7 +56,7 @@ type
   TJSONFalse = Data.DBXJSON.TJSONFalse;
 {$ELSE}
   TJsonValue = System.JSON.TJsonValue;
-  TJSONBool = System.JSON.TJSONBool;
+  //TJSONBool = System.JSON.TJSONBool; // not in XE6
   TJSONString = System.JSON.TJSONString;
   TJSONNumber = System.JSON.TJSONNumber;
   TJsonObject = System.JSON.TJsonObject;

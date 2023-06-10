@@ -12,7 +12,7 @@
  *         https://github.com/sempare/sempare-delphi-template-engine                                *
  ****************************************************************************************************
  *                                                                                                  *
- * Copyright (c) 2020 Sempare Limited                                                               *
+ * Copyright (c) 2019-2023 Sempare Limited                                                          *
  *                                                                                                  *
  * Contact: info@sempare.ltd                                                                        *
  *                                                                                                  *
@@ -43,38 +43,61 @@ type
 
   TBaseTemplateVisitor = class(TInterfacedObject, ITemplateVisitor)
   public
-    procedure Visit(AContainer: ITemplate); overload; virtual;
-    procedure Visit(AContainer: ITemplateVisitorHost); overload; virtual;
+    procedure Visit(const AContainer: ITemplate); overload; virtual;
 
-    procedure Visit(AExpr: IExpr); overload; virtual;
-    procedure Visit(AExpr: IBinopExpr); overload; virtual;
-    procedure Visit(AExpr: IUnaryExpr); overload; virtual;
-    procedure Visit(AExpr: IVariableExpr); overload; virtual;
-    procedure Visit(AExpr: IVariableDerefExpr); overload; virtual;
-    procedure Visit(AExpr: IValueExpr); overload; virtual;
-    procedure Visit(AExprList: IExprList); overload; virtual;
-    procedure Visit(AExpr: ITernaryExpr); overload; virtual;
-    procedure Visit(AExpr: IArrayExpr); overload; virtual;
+    procedure Visit(const AExpr: IExpr); overload; virtual;
+    procedure Visit(const AExpr: IBinopExpr); overload; virtual;
+    procedure Visit(const AExpr: IUnaryExpr); overload; virtual;
+    procedure Visit(const AExpr: IVariableExpr); overload; virtual;
+    procedure Visit(const AExpr: IVariableDerefExpr); overload; virtual;
+    procedure Visit(const AExpr: IValueExpr); overload; virtual;
+    procedure Visit(const AExpr: INewLineExpr); overload; virtual;
+    procedure Visit(const AExpr: IWhitespaceExpr); overload; virtual;
+    procedure Visit(const AExprList: IExprList); overload; virtual;
+    procedure Visit(const AExpr: ITernaryExpr); overload; virtual;
+    procedure Visit(const AExpr: IArrayExpr); overload; virtual;
+    procedure Visit(const AStmt: IFunctionCallExpr); overload; virtual;
+    procedure Visit(const AStmt: IMethodCallExpr); overload; virtual;
+    procedure Visit(const AStmt: IEncodeExpr); overload; virtual;
 
-    procedure Visit(AStmt: IStmt); overload; virtual;
-    procedure Visit(AStmt: IAssignStmt); overload; virtual;
-    procedure Visit(AStmt: IContinueStmt); overload; virtual;
-    procedure Visit(AStmt: IElseStmt); overload; virtual;
-    procedure Visit(AStmt: IBreakStmt); overload; virtual;
-    procedure Visit(AStmt: IEndStmt); overload; virtual;
-    procedure Visit(AStmt: IIncludeStmt); overload; virtual;
-    procedure Visit(AStmt: IRequireStmt); overload; virtual;
-    procedure Visit(AStmt: IEncodeExpr); overload; virtual;
-    procedure Visit(AStmt: IPrintStmt); overload; virtual;
-    procedure Visit(AStmt: IIfStmt); overload; virtual;
-    procedure Visit(AStmt: IWhileStmt); overload; virtual;
-    procedure Visit(AStmt: IForInStmt); overload; virtual;
-    procedure Visit(AStmt: IForRangeStmt); overload; virtual;
-    procedure Visit(AStmt: IFunctionCallExpr); overload; virtual;
-    procedure Visit(AStmt: IMethodCallExpr); overload; virtual;
-    procedure Visit(AStmt: IProcessTemplateStmt); overload; virtual;
-    procedure Visit(AStmt: IDefineTemplateStmt); overload; virtual;
-    procedure Visit(AStmt: IWithStmt); overload; virtual;
+    procedure Visit(const AStmt: IAssignStmt); overload; virtual;
+    procedure Visit(const AStmt: IContinueStmt); overload; virtual;
+    procedure Visit(const AStmt: IElseStmt); overload; virtual;
+    procedure Visit(const AStmt: IBreakStmt); overload; virtual;
+    procedure Visit(const AStmt: IEndStmt); overload; virtual;
+    procedure Visit(const AStmt: IIncludeStmt); overload; virtual;
+    procedure Visit(const AStmt: IRequireStmt); overload; virtual;
+    procedure Visit(const AStmt: IPrintStmt); overload; virtual;
+    procedure Visit(const AStmt: IIfStmt); overload; virtual;
+    procedure Visit(const AStmt: IWhileStmt); overload; virtual;
+    procedure Visit(const AStmt: IForInStmt); overload; virtual;
+    procedure Visit(const AStmt: IForRangeStmt); overload; virtual;
+    procedure Visit(const AStmt: IProcessTemplateStmt); overload; virtual;
+    procedure Visit(const AStmt: IDefineTemplateStmt); overload; virtual;
+    procedure Visit(const AStmt: IWithStmt); overload; virtual;
+    procedure Visit(const AStmt: ICycleStmt); overload; virtual;
+    procedure Visit(const AStmt: IDebugStmt); overload; virtual;
+    procedure Visit(const AStmt: ICompositeStmt); overload; virtual;
+    procedure Visit(const AStmt: IStripStmt); overload; virtual;
+    procedure Visit(const AStmt: IStmt); overload; virtual;
+    procedure Visit(const AStmt: INoopStmt); overload; virtual;
+
+    procedure Visit(const AStmt: IBlockStmt); overload; virtual;
+    procedure Visit(const AStmt: IExtendsStmt); overload; virtual;
+  end;
+
+  TNoExprTemplateVisitor = class(TBaseTemplateVisitor, ITemplateVisitor)
+  public
+
+    procedure Visit(const AExpr: IBinopExpr); overload; override;
+    procedure Visit(const AExpr: IUnaryExpr); overload; override;
+    procedure Visit(const AExpr: IVariableDerefExpr); overload; override;
+    procedure Visit(const AExprList: IExprList); overload; override;
+    procedure Visit(const AExpr: ITernaryExpr); overload; override;
+    procedure Visit(const AExpr: IArrayExpr); overload; override;
+    procedure Visit(const AStmt: IFunctionCallExpr); overload; override;
+    procedure Visit(const AStmt: IMethodCallExpr); overload; override;
+    procedure Visit(const AStmt: IEncodeExpr); overload; override;
 
   end;
 
@@ -86,160 +109,275 @@ uses
 
 { TBaseTemplateVisitor }
 
-procedure TBaseTemplateVisitor.Visit(AExpr: IVariableExpr);
+procedure TBaseTemplateVisitor.Visit(const AExpr: IVariableExpr);
 begin
-
+  // don't do anything
 end;
 
-procedure TBaseTemplateVisitor.Visit(AExpr: IValueExpr);
+procedure TBaseTemplateVisitor.Visit(const AExpr: IValueExpr);
 begin
-
+  // don't do anything
 end;
 
-procedure TBaseTemplateVisitor.Visit(AExprList: IExprList);
-var
-  LIndex: integer;
+procedure TBaseTemplateVisitor.Visit(const AExprList: IExprList);
 begin
-  for LIndex := 0 to AExprList.Count - 1 do
-    AcceptVisitor(AExprList[LIndex], self);
+  AcceptVisitor(AExprList, self);
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IStmt);
+procedure TBaseTemplateVisitor.Visit(const AStmt: IStmt);
 begin
   raise ETemplateVisitor.Create(SStatementNotSupportedInVisitor);
 end;
 
-procedure TBaseTemplateVisitor.Visit(AContainer: ITemplateVisitorHost);
-begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AExpr: IExpr);
+procedure TBaseTemplateVisitor.Visit(const AExpr: IExpr);
 begin
   raise ETemplateVisitor.Create(SExpressionNotSupportedInVisitor);
 end;
 
-procedure TBaseTemplateVisitor.Visit(AExpr: IBinopExpr);
+procedure TBaseTemplateVisitor.Visit(const AExpr: IBinopExpr);
+begin
+  AcceptVisitor(AExpr.LeftExpr, self);
+  AcceptVisitor(AExpr.RightExpr, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AExpr: IUnaryExpr);
+begin
+  AcceptVisitor(AExpr.Expr, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IIfStmt);
+begin
+  AcceptVisitor(AStmt.Condition, self);
+  AcceptVisitor(AStmt.TrueContainer, self);
+  AcceptVisitor(AStmt.FalseContainer, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IWhileStmt);
+begin
+  AcceptVisitor(AStmt.Condition, self);
+  AcceptVisitor(AStmt.Container, self);
+  AcceptVisitor(AStmt.OffsetExpr, self);
+  AcceptVisitor(AStmt.LimitExpr, self);
+  AcceptVisitor(AStmt.OnBeginContainer, self);
+  AcceptVisitor(AStmt.OnEndContainer, self);
+  AcceptVisitor(AStmt.OnEmptyContainer, self);
+  AcceptVisitor(AStmt.BetweenItemsContainer, self);
+
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IForInStmt);
+begin
+  AcceptVisitor(AStmt.Expr, self);
+  AcceptVisitor(AStmt.Container, self);
+  AcceptVisitor(AStmt.OffsetExpr, self);
+  AcceptVisitor(AStmt.LimitExpr, self);
+  AcceptVisitor(AStmt.OnBeginContainer, self);
+  AcceptVisitor(AStmt.OnEndContainer, self);
+  AcceptVisitor(AStmt.OnEmptyContainer, self);
+  AcceptVisitor(AStmt.BetweenItemsContainer, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IForRangeStmt);
+begin
+  AcceptVisitor(AStmt.LowExpr, self);
+  AcceptVisitor(AStmt.HighExpr, self);
+  AcceptVisitor(AStmt.StepExpr, self);
+  AcceptVisitor(AStmt.Container, self);
+  AcceptVisitor(AStmt.OnBeginContainer, self);
+  AcceptVisitor(AStmt.OnEndContainer, self);
+  AcceptVisitor(AStmt.OnEmptyContainer, self);
+  AcceptVisitor(AStmt.BetweenItemsContainer, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AContainer: ITemplate);
+begin
+  AcceptVisitor(AContainer, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IAssignStmt);
+begin
+  AcceptVisitor(AStmt.Expr, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IIncludeStmt);
+begin
+  AcceptVisitor(AStmt.Expr, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AExpr: IVariableDerefExpr);
+begin
+  AcceptVisitor(AExpr.Variable, self);
+  AcceptVisitor(AExpr.DerefExpr, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IContinueStmt);
 begin
 
 end;
 
-procedure TBaseTemplateVisitor.Visit(AExpr: IUnaryExpr);
+procedure TBaseTemplateVisitor.Visit(const AStmt: IBreakStmt);
 begin
 
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IIfStmt);
+procedure TBaseTemplateVisitor.Visit(const AStmt: IEndStmt);
 begin
 
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IWhileStmt);
+procedure TBaseTemplateVisitor.Visit(const AStmt: IPrintStmt);
+begin
+  AcceptVisitor(AStmt.Expr, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IFunctionCallExpr);
+begin
+  AcceptVisitor(AStmt.ExprList, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IElseStmt);
 begin
 
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IForInStmt);
+procedure TBaseTemplateVisitor.Visit(const AStmt: IMethodCallExpr);
+begin
+  AcceptVisitor(AStmt.ObjectExpr, self);
+  AcceptVisitor(AStmt.ExprList, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IEncodeExpr);
+begin
+  AcceptVisitor(AStmt.Expr, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IProcessTemplateStmt);
+begin
+  AcceptVisitor(AStmt.Container, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IDefineTemplateStmt);
+begin
+  AcceptVisitor(AStmt.Name, self);
+  AcceptVisitor(AStmt.Container, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IWithStmt);
+begin
+  AcceptVisitor(AStmt.Expr, self);
+  AcceptVisitor(AStmt.Container, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IRequireStmt);
+begin
+  AcceptVisitor(AStmt.ExprList, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AExpr: IArrayExpr);
+begin
+  AcceptVisitor(AExpr.ExprList, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AExpr: ITernaryExpr);
+begin
+  AcceptVisitor(AExpr.Condition, self);
+  AcceptVisitor(AExpr.TrueExpr, self);
+  AcceptVisitor(AExpr.FalseExpr, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: ICycleStmt);
+begin
+  AcceptVisitor(AStmt.List, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IDebugStmt);
+begin
+  AcceptVisitor(AStmt.Stmt, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IBlockStmt);
+begin
+  AcceptVisitor(AStmt.Name, self);
+  AcceptVisitor(AStmt.Container, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IStripStmt);
 begin
 
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IForRangeStmt);
+procedure TBaseTemplateVisitor.Visit(const AStmt: ICompositeStmt);
+begin
+  AcceptVisitor(AStmt.FirstStmt, self);
+  AcceptVisitor(AStmt.SecondStmt, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: IExtendsStmt);
+begin
+  AcceptVisitor(AStmt.Name, self);
+  AcceptVisitor(AStmt.BlockContainer, self);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AExpr: IWhitespaceExpr);
+begin
+  Visit(AExpr as IValueExpr);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AExpr: INewLineExpr);
+begin
+  Visit(AExpr as IValueExpr);
+end;
+
+procedure TBaseTemplateVisitor.Visit(const AStmt: INoopStmt);
 begin
 
 end;
 
-procedure TBaseTemplateVisitor.Visit(AContainer: ITemplate);
-var
-  LIdx: integer;
+{ TNoExprTemplateVisitor }
+
+procedure TNoExprTemplateVisitor.Visit(const AExprList: IExprList);
 begin
-  for LIdx := 0 to AContainer.Count - 1 do
-    AContainer.Items[LIdx].Accept(self);
+  // do nothing
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IAssignStmt);
-begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AStmt: IIncludeStmt);
+procedure TNoExprTemplateVisitor.Visit(const AExpr: IVariableDerefExpr);
 begin
 
 end;
 
-procedure TBaseTemplateVisitor.Visit(AExpr: IVariableDerefExpr);
+procedure TNoExprTemplateVisitor.Visit(const AExpr: IUnaryExpr);
 begin
-
+  // do nothing
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IContinueStmt);
+procedure TNoExprTemplateVisitor.Visit(const AExpr: IBinopExpr);
 begin
-
+  // do nothing
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IBreakStmt);
+procedure TNoExprTemplateVisitor.Visit(const AExpr: ITernaryExpr);
 begin
-
+  // do nothing
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IEndStmt);
+procedure TNoExprTemplateVisitor.Visit(const AStmt: IEncodeExpr);
 begin
-
+  // do nothing
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IPrintStmt);
+procedure TNoExprTemplateVisitor.Visit(const AStmt: IMethodCallExpr);
 begin
-
+  // do nothing
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IFunctionCallExpr);
+procedure TNoExprTemplateVisitor.Visit(const AStmt: IFunctionCallExpr);
 begin
-
+  // do nothing
 end;
 
-procedure TBaseTemplateVisitor.Visit(AStmt: IElseStmt);
+procedure TNoExprTemplateVisitor.Visit(const AExpr: IArrayExpr);
 begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AStmt: IMethodCallExpr);
-begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AStmt: IEncodeExpr);
-begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AStmt: IProcessTemplateStmt);
-begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AStmt: IDefineTemplateStmt);
-begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AStmt: IWithStmt);
-begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AStmt: IRequireStmt);
-begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AExpr: IArrayExpr);
-begin
-
-end;
-
-procedure TBaseTemplateVisitor.Visit(AExpr: ITernaryExpr);
-begin
-
+  // do nothing
 end;
 
 end.

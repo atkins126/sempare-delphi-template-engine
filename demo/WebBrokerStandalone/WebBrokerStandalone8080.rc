@@ -1,0 +1,6 @@
+INDEX_TPL RCDATA "templates\\index.tpl"
+DYNFORM_TPL RCDATA "templates\\dynform.tpl"
+HELPER_TPL RCDATA "templates\\helper.tpl"
+TEMPLATE_TPL RCDATA "templates\\template.tpl"
+SUBMITTED_TPL RCDATA "templates\\submitted.tpl"
+ERROR404_TPL RCDATA "templates\\error404.tpl"

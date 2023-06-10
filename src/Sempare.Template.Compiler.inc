@@ -12,7 +12,7 @@
  *         https://github.com/sempare/sempare-delphi-template-engine                                *
  ****************************************************************************************************
  *                                                                                                  *
- * Copyright (c) 2020 Sempare Limited                                                               *
+ * Copyright (c) 2019-2023 Sempare Limited                                                          *
  *                                                                                                  *
  * Contact: info@sempare.ltd                                                                        *
  *                                                                                                  *
@@ -30,43 +30,61 @@
  * limitations under the License.                                                                   *
  *                                                                                                  *
  *************************************************************************************************%*)
+ 
+// -----------------------------------------------
+
+// Uncomment the following to confirm the license conditions
+// {$DEFINE SEMPARE_TEMPLATE_CONFIRM_LICENSE}
+ 
 // -----------------------------------------------
 {$IF CompilerVersion >= 25} // from XE4 onwards
-{$DEFINE SUPPORT_JSON_DBX true}
-{$DEFINE BROKEN_ARRAY_BOUNDS true}
+{$DEFINE SUPPORT_JSON_DBX}
+{$DEFINE BROKEN_ARRAY_BOUNDS}
 {$ENDIF}
 // -----------------------------------------------
 {$IF CompilerVersion >= 26} // from XE5 onwards
-{$UNDEF SUPPORT_JSON_DBX}
 {$UNDEF BROKEN_ARRAY_BOUNDS}
-{$DEFINE SUPPORT_JSON true}
+{$DEFINE SUPPORT_JSON}
+{$DEFINE SEMPARE_TEMPLATE_FIREDAC}
+{$ENDIF}
+// -----------------------------------------------
+{$IF CompilerVersion >= 27}  // from XE6 onwards
+{$UNDEF SUPPORT_JSON_DBX}
 {$ENDIF}
 // -----------------------------------------------
 {$IF CompilerVersion >= 28}  // from XE7 onwards
-{$DEFINE SUPPORT_NET_ENCODING true}
+{$DEFINE SUPPORT_NET_ENCODING}
+{$DEFINE SUPPORT_CLASS_CONSTRUCTOR}
 {$ENDIF}
 // -----------------------------------------------
 {$IF CompilerVersion >= 29}  // from XE8 onwards
-{$DEFINE SUPPORT_AS_VARREC true}
+{$DEFINE SUPPORT_AS_VARREC}
 {$ENDIF}
 // -----------------------------------------------
 {$IF CompilerVersion >= 30} // from Delphi 10.0 Seatle onwards
-{$DEFINE SUPPORT_JSON_BOOL true}
+{$DEFINE SUPPORT_JSON_BOOL}
+{$DEFINE SUPPORT_ENCODING}
+{$DEFINE SUPPORT_HASH}
+{$DEFINE SUPPORT_ADD_DYNARRAY}            // result := result + [istmt, istmt];
+{$DEFINE SUPPORT_PASS_ARRAY_OF_INTERFACE} // call a method like dosomething([istmt, istmt])
+{$DEFINE SUPPORT_WIN_REGISTRY}
 {$ENDIF}
 // -----------------------------------------------
 {$IF CompilerVersion >= 31}  // from Delphi 10.1 Berlin onwards
-{$DEFINE SUPPORT_BUFFERED_STREAM true}
+{$DEFINE SUPPORT_BUFFERED_STREAM}
+{$DEFINE SUPPORT_URL_FORM_ENCODING}
 {$ENDIF}
 // -----------------------------------------------
-
-// Uncomment the following to test TDataSet using FIREDAC TFDMemTable
-// {$DEFINE SEMPARE_TEMPLATE_FIREDAC}
+{$IF CompilerVersion >= 33}  // from Delphi 10.3 Rio onwards
+{$DEFINE SUPPORT_CUSTOM_MANAGED_RECORDS}
+{$ENDIF}
+// -----------------------------------------------
 
 // Uncomment the following if Indy is not present
 // {$DEFINE SEMPARE_TEMPLATE_NO_INDY}
 
 {$IFNDEF SEMPARE_TEMPLATE_NO_INDY}
-{$DEFINE SEMPARE_TEMPLATE_INDY true}
+{$DEFINE SEMPARE_TEMPLATE_INDY}
 {$ENDIF}
 // -----------------------------------------------
 
@@ -76,7 +94,7 @@
 {$IFDEF SUPPORT_NET_ENCODING}
 {$UNDEF SEMPARE_TEMPLATE_INDY}
 {$ENDIF}
-{$DEFINE SEMPARE_TEMPLATE_HAS_HTML_ENCODER true}
+{$DEFINE SEMPARE_TEMPLATE_HAS_HTML_ENCODER}
 {$ENDIF}
 {$IFNDEF SEMPARE_TEMPLATE_HAS_HTML_ENCODER}
 {$MESSAGE 'No default html encoder present.'}

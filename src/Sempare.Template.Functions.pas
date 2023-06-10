@@ -1,4 +1,4 @@
-(*%*************************************************************************************************
+(*%**************************************************************************************************
  *                 ___                                                                              *
  *                / __|  ___   _ __    _ __   __ _   _ _   ___                                      *
  *                \__ \ / -_) | '  \  | '_ \ / _` | | '_| / -_)                                     *
@@ -12,7 +12,7 @@
  *         https://github.com/sempare/sempare-delphi-template-engine                                *
  ****************************************************************************************************
  *                                                                                                  *
- * Copyright (c) 2020 Sempare Limited                                                               *
+ * Copyright (c) 2019-2023 Sempare Limited                                                          *
  *                                                                                                  *
  * Contact: info@sempare.ltd                                                                        *
  *                                                                                                  *
@@ -34,6 +34,8 @@ unit Sempare.Template.Functions;
 
 interface
 
+{$I 'Sempare.Template.Compiler.inc'}
+
 uses
   System.Rtti,
   Sempare.Template.AST,
@@ -51,6 +53,15 @@ var
 implementation
 
 uses
+{$IFDEF SEMPARE_TEMPLATE_FIREDAC}
+  Data.DB,
+{$ENDIF}
+{$IFDEF SUPPORT_HASH}
+  System.Hash,
+{$ENDIF}
+{$IFDEF SUPPORT_ENCODING}
+  System.NetEncoding,
+{$ENDIF}
   System.TypInfo, // needed for XE6 and below to access the TTypeKind variables
   System.SysUtils,
   System.Math,
@@ -102,7 +113,7 @@ var
   LMethodName: string;
   LLength: integer;
 begin
-  result := AMethod.IsStatic and AMethod.IsClassMethod and (AMethod.ReturnType.TypeKind <> tkProcedure);
+  result := AMethod.IsStatic and AMethod.IsClassMethod;
   if not result then
     exit;
   LMethodName := AMethod.Name.ToLower;
@@ -139,6 +150,8 @@ type
     class function Lowercase(const AString: string): string; static;
     class function Uppercase(const AString: string): string; static;
     class function Trim(const AString: string): string; static;
+    class function TrimLeft(const AString: string): string; static;
+    class function TrimRight(const AString: string): string; static;
     class function SubStr(const AString: string; AStartOffset: integer): string; overload; static;
     class function SubStr(const AString: string; AStartOffset, ALength: integer): string; overload; static;
     class function Substring(const AString: string; AStartOffset, AEndOffset: integer): string; overload; static;
@@ -146,20 +159,24 @@ type
     class function Pos(const search, Str: string; offset: integer): integer; overload; static;
     class function Pos(const search, Str: string): integer; overload; static;
     class function Len(const AString: TValue): integer; static;
-    class function Fmt(const AArgs: TArray<TValue>): string; static;
+    class function Fmt(const AContext: ITemplateContext; const AArgs: TArray<TValue>): string; static;
     class function FmtDt(const AFormat: string; const ADateTime: TDateTime): string; static;
     class function DtNow: TDateTime; static;
-    class function BoolStr(const AValue: TValue): boolean; static;
+    class function BoolStr(const AContext: ITemplateContext; const AValue: TValue): boolean; static;
     class function Bool(const AValue: TValue): boolean; static;
-    class function Num(const AValue: TValue): extended; static;
-    class function Int(const AValue: TValue): integer; static;
-    class function Str(const AValue: TValue): string; static;
+    class function Num(const AContext: ITemplateContext; const AValue: TValue): extended; static;
+    class function Int(const AContext: ITemplateContext; const AValue: TValue): integer; static;
+    class function Str(const AContext: ITemplateContext; const AValue: TValue): string; static;
     class function UCFirst(const AString: string): string; static;
     class function Rev(const AString: string): string; static;
     class function IsNull(const AValue: TValue): boolean; static;
+    class function IsNil(const AValue: TValue): boolean; static;
+    class function IsEmpty(const AValue: TValue): boolean; static;
+    class function IsObject(const AValue: TValue): boolean; static;
+    class function IsRecord(const AValue: TValue): boolean; static;
     class function IsStr(const AValue: TValue): boolean; static;
     class function IsInt(const AValue: TValue): boolean; static;
-    class function IsBool(const AValue): boolean; static;
+    class function IsBool(const AValue: TValue): boolean; static;
     class function IsNum(const AValue: TValue): boolean; static;
     class function StartsWith(const AString, ASearch: string): boolean; overload; static;
     class function StartsWith(const AString, ASearch: string; const AIgnoreCase: boolean): boolean; overload; static;
@@ -179,7 +196,40 @@ type
     class function PadLeft(const AStr: string; const ANum: integer): string; overload; static;
     class function PadRight(const AStr: string; const ANum: integer): string; overload; static;
     class function PadRight(const AStr: string; const ANum: integer; const APadChar: char): string; overload; static;
+    class function Min(const AValue, BValue: double): double; static;
+    class function Max(const AValue, BValue: double): double; static;
+    class function Abs(const AValue: double): double; static;
+{$IFDEF SEMPARE_TEMPLATE_FIREDAC}
+    class function RecordCount(const ADataset: TDataSet): integer; static;
+    class function IsDataSet(const ADataset: TValue): boolean; static;
+{$ENDIF}
+{$IFDEF SUPPORT_ENCODING}
+    class function Base64Encode(const AStr: string): string; static;
+    class function Base64Decode(const AStr: string): string; static;
+    class function HtmlUnescape(const AStr: string): string; static;
+    class function HtmlEscape(const AStr: string): string; static;
+{$ENDIF}
+{$IFDEF SUPPORT_URL_FORM_ENCODING}
+    class function UrlDecode(const AStr: string): string; static;
+    class function FormDecode(const AStr: string): string; static;
+{$ENDIF}
+{$IFDEF SUPPORT_HASH}
+    class function Md5(const AStr: string): string; static;
+    class function Sha1(const AStr: string): string; static;
+    class function Sha256(const AStr: string): string; static;
+{$ENDIF}
+    class function TemplateExists(const AContext: ITemplateContext; const AStr: string): boolean; static;
   end;
+
+class function TInternalFuntions.Min(const AValue, BValue: double): double;
+begin
+  exit(System.Math.Min(AValue, BValue));
+end;
+
+class function TInternalFuntions.Max(const AValue, BValue: double): double;
+begin
+  exit(System.Math.Max(AValue, BValue));
+end;
 
 class function TInternalFuntions.PadLeft(const AStr: string; const ANum: integer): string;
 begin
@@ -243,6 +293,27 @@ begin
   TArray.Sort<T>(LArray);
   exit(TValue.From < TArray < T >> (LArray));
 end;
+{$IFDEF SUPPORT_HASH}
+
+class function TInternalFuntions.Sha1(const AStr: string): string;
+begin
+  exit(THashSha1.GetHashString(AStr));
+end;
+
+class function TInternalFuntions.Sha256(const AStr: string): string;
+var
+  LHash: THashSha2;
+begin
+  LHash := THashSha2.Create(THashSha2.TSHA2Version.Sha256);
+  LHash.Update(AStr);
+  exit(LHash.HashAsString);
+end;
+
+class function TInternalFuntions.Md5(const AStr: string): string;
+begin
+  exit(THashMD5.GetHashString(AStr));
+end;
+{$ENDIF}
 
 class function TInternalFuntions.Sort(const AArray: TValue): TValue;
 
@@ -299,9 +370,9 @@ begin
   exit(''.PadLeft(ANum, #10));
 end;
 
-class function TInternalFuntions.Num(const AValue: TValue): extended;
+class function TInternalFuntions.Num(const AContext: ITemplateContext; const AValue: TValue): extended;
 begin
-  exit(AsNum(AValue));
+  exit(AsNum(AValue, AContext));
 end;
 
 class function TInternalFuntions.Ord(const AValue: string): int64;
@@ -316,9 +387,26 @@ begin
   exit(AString.ToUpper());
 end;
 
+class function TInternalFuntions.TemplateExists(const AContext: ITemplateContext; const AStr: string): boolean;
+var
+  LTemplate: ITemplate;
+begin
+  exit(AContext.TryGetTemplate(AStr, LTemplate));
+end;
+
 class function TInternalFuntions.Trim(const AString: string): string;
 begin
   exit(AString.Trim());
+end;
+
+class function TInternalFuntions.TrimLeft(const AString: string): string;
+begin
+  exit(AString.TrimLeft);
+end;
+
+class function TInternalFuntions.TrimRight(const AString: string): string;
+begin
+  exit(AString.TrimRight);
 end;
 
 class function TInternalFuntions.TypeOf(const AValue: TValue): string;
@@ -446,7 +534,7 @@ begin
           end;
         end;
     else
-      raise ETemplateFunction.Create(STypeNotSupported);
+      raise ETemplateFunction.CreateRes(@STypeNotSupported);
     end;
 end;
 {$ENDIF}
@@ -474,9 +562,9 @@ begin
   exit(AString.EndsWith(ASearch, AIgnoreCase));
 end;
 
-class function TInternalFuntions.Fmt(const AArgs: TArray<TValue>): string;
+class function TInternalFuntions.Fmt(const AContext: ITemplateContext; const AArgs: TArray<TValue>): string;
 begin
-  exit(format(AsString(AArgs[0]), ToArrayTVarRec(copy(AArgs, 1, length(AArgs) - 1))));
+  exit(format(AsString(AArgs[0], AContext), ToArrayTVarRec(copy(AArgs, 1, length(AArgs) - 1))));
 end;
 
 class function TInternalFuntions.FmtDt(const AFormat: string; const ADateTime: TDateTime): string;
@@ -484,15 +572,55 @@ begin
   exit(FormatDateTime(AFormat, ADateTime));
 end;
 
+{$IFDEF SUPPORT_URL_FORM_ENCODING}
+class function TInternalFuntions.FormDecode(const AStr: string): string;
+begin
+  exit(TNetEncoding.URL.FormDecode(AStr));
+end;
+
+class function TInternalFuntions.UrlDecode(const AStr: string): string;
+begin
+  exit(TNetEncoding.URL.UrlDecode(AStr));
+end;
+{$ENDIF}
+
+{$IFDEF SUPPORT_ENCODING}
+
+class function TInternalFuntions.HtmlEscape(const AStr: string): string;
+begin
+  exit(TNetEncoding.HTML.Encode(AStr));
+end;
+
+class function TInternalFuntions.HtmlUnescape(const AStr: string): string;
+begin
+  exit(TNetEncoding.HTML.Decode(AStr));
+end;
+
+class function TInternalFuntions.Base64Decode(const AStr: string): string;
+begin
+  exit(TNetEncoding.Base64.Decode(AStr));
+end;
+
+class function TInternalFuntions.Base64Encode(const AStr: string): string;
+begin
+  exit(TNetEncoding.Base64.Encode(AStr));
+end;
+{$ENDIF}
+
+class function TInternalFuntions.Abs(const AValue: double): double;
+begin
+  exit(System.Abs(AValue));
+end;
+
 class function TInternalFuntions.Bool(const AValue: TValue): boolean;
 begin
   exit(AsBoolean(AValue));
 end;
 
-class function TInternalFuntions.BoolStr(const AValue: TValue): boolean;
+class function TInternalFuntions.BoolStr(const AContext: ITemplateContext; const AValue: TValue): boolean;
 begin
   if isStrLike(AValue) then
-    exit(AsString(AValue) = 'true')
+    exit(AsString(AValue, AContext) = 'true')
   else
     exit(AsBoolean(AValue));
 end;
@@ -522,9 +650,9 @@ begin
   exit(System.SysUtils.Now);
 end;
 
-class function TInternalFuntions.Int(const AValue: TValue): integer;
+class function TInternalFuntions.Int(const AContext: ITemplateContext; const AValue: TValue): integer;
 begin
-  exit(asInt(AValue));
+  exit(asInt(AValue, AContext));
 end;
 
 class function TInternalFuntions.StartsWith(const AString, ASearch: string): boolean;
@@ -542,9 +670,9 @@ begin
   exit(AString.StartsWith(ASearch, AIgnoreCase));
 end;
 
-class function TInternalFuntions.Str(const AValue: TValue): string;
+class function TInternalFuntions.Str(const AContext: ITemplateContext; const AValue: TValue): string;
 begin
-  exit(AsString(AValue));
+  exit(AsString(AValue, AContext));
 end;
 
 function reverse(const AStr: string): string;
@@ -580,9 +708,14 @@ begin
   exit(reverse(AString));
 end;
 
-class function TInternalFuntions.IsNull(const AValue: TValue): boolean;
+class function TInternalFuntions.IsNil(const AValue: TValue): boolean;
 begin
   exit(IsNull(AValue));
+end;
+
+class function TInternalFuntions.IsNull(const AValue: TValue): boolean;
+begin
+  exit(Sempare.Template.Rtti.IsNull(AValue));
 end;
 
 class function TInternalFuntions.IsStr(const AValue: TValue): boolean;
@@ -595,14 +728,34 @@ begin
   exit(isIntLike(AValue));
 end;
 
-class function TInternalFuntions.IsBool(const AValue): boolean;
+class function TInternalFuntions.IsBool(const AValue: TValue): boolean;
 begin
-  exit(IsBool(AValue));
+  exit(Sempare.Template.Rtti.IsBool(AValue));
+end;
+
+class function TInternalFuntions.IsEmpty(const AValue: TValue): boolean;
+var
+  LObject: TObject;
+begin
+  if not AValue.IsObject then
+    exit(false);
+  LObject := AValue.AsObject;
+  exit(not assigned(LObject) or IsEmptyObject(LObject));
 end;
 
 class function TInternalFuntions.IsNum(const AValue: TValue): boolean;
 begin
   exit(isnumlike(AValue));
+end;
+
+class function TInternalFuntions.IsObject(const AValue: TValue): boolean;
+begin
+  exit(AValue.IsObject);
+end;
+
+class function TInternalFuntions.IsRecord(const AValue: TValue): boolean;
+begin
+  exit(AValue.Kind in [tkRecord{$IFDEF SUPPORT_CUSTOM_MANAGED_RECORDS}, tkMRecord{$ENDIF}]);
 end;
 
 constructor TTemplateFunctions.Create;
@@ -641,7 +794,7 @@ end;
 function TValueCompare.Compare(const ALeft, ARight: TValue): integer;
 begin
   if ALeft.TypeInfo <> ARight.TypeInfo then
-    raise ETemplateFunction.Create(STypesAreNotOfTheSameType);
+    raise ETemplateFunction.CreateRes(@STypesAreNotOfTheSameType);
   case ALeft.Kind of
     tkInteger, tkInt64:
       exit(TComparer<int64>.Default.Compare(ALeft.AsInt64, ARight.AsInt64));
@@ -650,7 +803,7 @@ begin
     tkString, tkLString, tkWString, tkUString:
       exit(TComparer<string>.Default.Compare(ALeft.AsString, ARight.AsString));
   else
-    raise ETemplateFunction.Create(STypeNotSupported);
+    raise ETemplateFunction.CreateRes(@STypeNotSupported);
   end;
 end;
 
@@ -658,6 +811,18 @@ class function TInternalFuntions.PadLeft(const AStr: string; const ANum: integer
 begin
   exit(AStr.PadLeft(ANum, APadChar));
 end;
+{$IFDEF SEMPARE_TEMPLATE_FIREDAC}
+
+class function TInternalFuntions.IsDataSet(const ADataset: TValue): boolean;
+begin
+  exit(ADataset.IsObject and ADataset.IsInstanceOf(TDataSet));
+end;
+
+class function TInternalFuntions.RecordCount(const ADataset: TDataSet): integer;
+begin
+  exit(ADataset.RecordCount);
+end;
+{$ENDIF}
 
 initialization
 
